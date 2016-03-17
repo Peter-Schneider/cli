@@ -21,9 +21,6 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
 {
     public class Executable
     {
-        // GROOOOOSS
-        private static readonly string RedistPackageName = "Microsoft.NETCore.App";
-
         private readonly ProjectContext _context;
 
         private readonly LibraryExporter _exporter;
@@ -133,15 +130,30 @@ namespace Microsoft.Dotnet.Cli.Compiler.Common
                 var runtimeOptions = new JObject();
                 json.Add("runtimeOptions", runtimeOptions);
 
-                var redistExport = exporter
-                    .GetAllExports()
-                    .FirstOrDefault(l => l.Library.Identity.Name.Equals(RedistPackageName, StringComparison.OrdinalIgnoreCase));
-                if (redistExport != null)
+                var redistPackage = _context.RootProject.Dependencies
+                    .Where(r => r.Type.Equals(LibraryDependencyType.Platform))
+                    .ToList();
+                if(redistPackage.Count > 0)
                 {
-                    var framework = new JObject(
-                        new JProperty("name", redistExport.Library.Identity.Name),
-                        new JProperty("version", redistExport.Library.Identity.Version.ToNormalizedString()));
-                    runtimeOptions.Add("framework", framework);
+                    if(redistPackage.Count > 1)
+                    {
+                        throw new InvalidOperationException("Multiple packages with type: \"platform\" were specified!");
+                    }
+                    var packageName = redistPackage.Single().Name;
+
+                    var redistExport = exporter.GetAllExports()
+                        .FirstOrDefault(e => e.Library.Identity.Name.Equals(packageName));
+                    if (redistExport == null)
+                    {
+                        throw new InvalidOperationException($"Platform package '{packageName}' was not present in the graph.");
+                    }
+                    else
+                    {
+                        var framework = new JObject(
+                            new JProperty("name", redistExport.Library.Identity.Name),
+                            new JProperty("version", redistExport.Library.Identity.Version.ToNormalizedString()));
+                        runtimeOptions.Add("framework", framework);
+                    }
                 }
 
                 var runtimeConfigJsonFile = Path.Combine(_runtimeOutputPath, _context.ProjectFile.Name + FileNameSuffixes.RuntimeConfigJson);

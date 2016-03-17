@@ -95,11 +95,7 @@ namespace Microsoft.Extensions.DependencyModel
             foreach (var libraryDependency in export.Library.Dependencies)
             {
                 // skip build time dependencies
-                if (!libraryDependency.Type.HasFlag(
-                        LibraryDependencyTypeFlag.MainReference |
-                        LibraryDependencyTypeFlag.MainExport |
-                        LibraryDependencyTypeFlag.RuntimeComponent |
-                        LibraryDependencyTypeFlag.BecomesNupkgDependency))
+                if (libraryDependency.Type.Equals(LibraryDependencyType.Build))
                 {
                     continue;
                 }

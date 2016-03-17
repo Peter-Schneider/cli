@@ -259,7 +259,7 @@ namespace Microsoft.DotNet.Tools.Publish
 
         private static void PublishFiles(IEnumerable<LibraryAsset> files, string outputPath, bool nativeSubdirectories, bool preserveRelativePath)
         {
-            foreach (var file in files)
+            foreach (var file in files.Where(a => !a.IsPlaceholder))
             {
                 var destinationDirectory = DetermineFileDestinationDirectory(file, outputPath, nativeSubdirectories);
 
