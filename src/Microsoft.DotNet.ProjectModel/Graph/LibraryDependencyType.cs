@@ -20,9 +20,13 @@ namespace Microsoft.DotNet.ProjectModel.Graph
         }
 
         public static LibraryDependencyType Parse(string value) => new LibraryDependencyType(value.ToLowerInvariant());
+
         public override int GetHashCode() => Value.GetHashCode();
+
         public override bool Equals(object obj) => obj is LibraryDependencyType && Equals((LibraryDependencyType)obj);
+
         public bool Equals(string other) => string.Equals(Value, other, StringComparison.Ordinal);
+
         public bool Equals(LibraryDependencyType other) => string.Equals(Value, other.Value, StringComparison.Ordinal);
     }
 }
