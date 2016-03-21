@@ -158,8 +158,8 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         private LibraryExport ExportPackage(PackageDescription package)
         {
             var builder = LibraryExportBuilder.Create(package);
-            builder.WithNativeLibraries(PopulateAssets(package, package.NativeLibraries));
-            builder.WithRuntimeAssemblies(PopulateAssets(package, package.RuntimeAssemblies));
+            builder.AddNativeLibraryGroup(new LibraryAssetGroup(PopulateAssets(package, package.NativeLibraries)));
+            builder.AddRuntimeAssemblyGroup(new LibraryAssetGroup(PopulateAssets(package, package.RuntimeAssemblies)));
             builder.WithCompilationAssemblies(PopulateAssets(package, package.CompileTimeAssemblies));
             builder.WithSourceReferences(GetSharedSources(package));
             builder.WithAnalyzerReference(GetAnalyzerReferences(package));
@@ -220,7 +220,15 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                         }
                     }
 
-                    builder.AddRuntimeTarget(new RuntimeAssetGroup(targetGroup.Key, runtime, native));
+                    if (runtime.Any())
+                    {
+                        builder.AddRuntimeAssemblyGroup(new LibraryAssetGroup(targetGroup.Key, runtime));
+                    }
+
+                    if (native.Any())
+                    {
+                        builder.AddNativeLibraryGroup(new LibraryAssetGroup(targetGroup.Key, native));
+                    }
                 }
             }
 
@@ -324,7 +332,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
             var builder = LibraryExportBuilder.Create(library);
             if (!string.IsNullOrEmpty(library.Path))
             {
-                builder.WithCompilationAssemblies(new []
+                builder.WithCompilationAssemblies(new[]
                 {
                     new LibraryAsset(library.Identity.Name, null, library.Path)
                 });

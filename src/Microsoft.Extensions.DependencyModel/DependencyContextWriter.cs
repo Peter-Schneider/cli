@@ -159,14 +159,14 @@ namespace Microsoft.Extensions.DependencyModel
              );
         }
 
-        private void AddAssets<T>(JObject libraryObject, IEnumerable<T> runtimeAssemblies, Func<T, string> keySelector)
+        private void AddAssets(JObject libraryObject, string key, RuntimeAssetGroup group)
         {
-            if (!runtimeAssemblies.Any())
+            if (group == null || !group.Assets.Any())
             {
                 return;
             }
-            libraryObject.Add(new JProperty(DependencyContextStrings.RuntimeAssembliesKey,
-                       WriteAssetList(runtimeAssemblies.Select(keySelector)))
+            libraryObject.Add(new JProperty(key,
+                       WriteAssetList(group.Assets.Select(a => a.Path)))
                    );
         }
 
@@ -231,14 +231,14 @@ namespace Microsoft.Extensions.DependencyModel
             if (runtimeLibrary != null)
             {
                 // Add runtime-agnostic assets
-                AddAssets(libraryObject, runtimeLibrary.Assemblies.GetRuntimeAgnosticAssets(), a => a.Path);
-                AddAssets(libraryObject, runtimeLibrary.NativeLibraries.GetRuntimeAgnosticAssets(), a => a);
+                AddAssets(libraryObject, DependencyContextStrings.RuntimeAssembliesKey, runtimeLibrary.Assemblies.FirstOrDefault(r => string.IsNullOrEmpty(r.Runtime)));
+                AddAssets(libraryObject, DependencyContextStrings.NativeLibrariesKey, runtimeLibrary.NativeLibraries.FirstOrDefault(r => string.IsNullOrEmpty(r.Runtime)));
                 AddResourceAssemblies(libraryObject, runtimeLibrary.ResourceAssemblies);
 
                 // Add runtime-specific assets
                 var runtimeTargets = new JObject();
-                AddRuntimeSpecificAssets(runtimeTargets, DependencyContextStrings.RuntimeAssetType, runtimeLibrary.Assemblies, a => a.Path);
-                AddRuntimeSpecificAssets(runtimeTargets, DependencyContextStrings.NativeAssetType, runtimeLibrary.NativeLibraries, a => a);
+                AddRuntimeSpecificAssets(runtimeTargets, DependencyContextStrings.RuntimeAssetType, runtimeLibrary.Assemblies);
+                AddRuntimeSpecificAssets(runtimeTargets, DependencyContextStrings.NativeAssetType, runtimeLibrary.NativeLibraries);
                 if (runtimeTargets.Count > 0)
                 {
                     libraryObject.Add(DependencyContextStrings.RuntimeTargetsPropertyName, runtimeTargets);
@@ -258,13 +258,13 @@ namespace Microsoft.Extensions.DependencyModel
             return libraryObject;
         }
 
-        private void AddRuntimeSpecificAssets<T>(JObject runtimeTargets, string assetType, RuntimeAssetCollection<T> assets, Func<T, string> keySelector)
+        private void AddRuntimeSpecificAssetGroups<T>(JObject runtimeTargets, string assetType, IEnumerable<RuntimeAssetGroup> assetGroups)
         {
-            foreach (var group in assets.RuntimeGroups)
+            foreach (var group in assetGroups.Where(g => !string.IsNullOrEmpty(g.Runtime)))
             {
-                if (group.Value.Any())
+                if (group.Assets.Any())
                 {
-                    AddRuntimeSpecificAssets(runtimeTargets, group.Value.Select(keySelector), group.Key, assetType);
+                    AddRuntimeSpecificAssets(runtimeTargets, group.Assets, group.Runtime, assetType);
                 }
                 else
                 {
@@ -274,18 +274,18 @@ namespace Microsoft.Extensions.DependencyModel
                     var pseudoPathFolder = assetType == DependencyContextStrings.RuntimeAssetType ?
                         "lib" :
                         "native";
-                    runtimeTargets[$"runtime/{group.Key}/{assetType}/_._"] = new JObject(
-                        new JProperty(DependencyContextStrings.RidPropertyName, group.Key),
+                    runtimeTargets[$"runtime/{group.Runtime}/{pseudoPathFolder}/_._"] = new JObject(
+                        new JProperty(DependencyContextStrings.RidPropertyName, group.Runtime),
                         new JProperty(DependencyContextStrings.AssetTypePropertyName, assetType));
                 }
             }
         }
 
-        private void AddRuntimeSpecificAssets(JObject target, IEnumerable<string> assets, string runtime, string assetType)
+        private void AddRuntimeSpecificAssets(JObject target, IEnumerable<RuntimeAsset> assets, string runtime, string assetType)
         {
             foreach (var asset in assets)
             {
-                target.Add(new JProperty(NormalizePath(asset),
+                target.Add(new JProperty(NormalizePath(asset.Path),
                     new JObject(
                         new JProperty(DependencyContextStrings.RidPropertyName, runtime),
                         new JProperty(DependencyContextStrings.AssetTypePropertyName, assetType)

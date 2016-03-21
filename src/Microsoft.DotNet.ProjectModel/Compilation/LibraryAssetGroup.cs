@@ -6,9 +6,11 @@ using System.Collections.Generic;
 
 namespace Microsoft.DotNet.ProjectModel.Compilation
 {
-    public class RuntimeAssetGroup
+    public class LibraryAssetGroup
     {
-        public RuntimeAssetGroup(string runtime,
+        public LibraryAssetGroup(IEnumerable<LibraryAsset> assets) : this(string.Empty, assets) { }
+
+        public LibraryAssetGroup(string runtime,
             IEnumerable<LibraryAsset> assets)
         {
             Runtime = runtime;
