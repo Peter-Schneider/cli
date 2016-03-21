@@ -14,10 +14,9 @@ namespace Microsoft.Extensions.DependencyModel
             string name,
             string version,
             string hash,
-            IEnumerable<RuntimeAssembly> assemblies,
-            IEnumerable<string> nativeLibraries,
+            RuntimeAssetCollection<RuntimeAssembly> assemblies,
+            RuntimeAssetCollection<string> nativeLibraries,
             IEnumerable<ResourceAssembly> resourceAssemblies,
-            IEnumerable<RuntimeTarget> subTargets,
             IEnumerable<Dependency> dependencies,
             bool serviceable)
             : base(type, name, version, hash, dependencies, serviceable)
@@ -34,22 +33,15 @@ namespace Microsoft.Extensions.DependencyModel
             {
                 throw new ArgumentNullException(nameof(resourceAssemblies));
             }
-            if (subTargets == null)
-            {
-                throw new ArgumentNullException(nameof(subTargets));
-            }
-            Assemblies = assemblies.ToArray();
+            Assemblies = assemblies;
             ResourceAssemblies = resourceAssemblies.ToArray();
-            RuntimeTargets = subTargets.ToArray();
-            NativeLibraries = nativeLibraries.ToArray();
+            NativeLibraries = nativeLibraries;
         }
 
-        public IReadOnlyList<RuntimeAssembly> Assemblies { get; }
+        public RuntimeAssetCollection<RuntimeAssembly> Assemblies { get; }
 
-        public IReadOnlyList<string> NativeLibraries { get; }
+        public RuntimeAssetCollection<string> NativeLibraries { get; }
 
         public IReadOnlyList<ResourceAssembly> ResourceAssemblies { get; }
-
-        public IReadOnlyList<RuntimeTarget> RuntimeTargets { get; }
     }
 }
