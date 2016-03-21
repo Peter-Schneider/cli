@@ -17,6 +17,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
         public string ResolvedPath { get; }
         public string FileName => Path.GetFileName(RelativePath);
         public Action<Stream, Stream> Transform { get; set; }
+        public bool IsPlaceholder => string.Equals(FileName, "_._", StringComparison.Ordinal);
 
         public LibraryAsset(string name, string relativePath, string resolvedPath, Action<Stream, Stream> transform = null)
         {

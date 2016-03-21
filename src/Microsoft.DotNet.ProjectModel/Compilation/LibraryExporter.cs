@@ -412,7 +412,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
 
         private IEnumerable<LibraryAsset> PopulateAssets(PackageDescription package, IEnumerable<LockFileItem> section)
         {
-            foreach (var assemblyPath in section.Where(i => !i.Path.Equals("_._")))
+            foreach (var assemblyPath in section)
             {
                 yield return LibraryAsset.CreateFromRelativePath(package.Path, assemblyPath.Path);
             }
