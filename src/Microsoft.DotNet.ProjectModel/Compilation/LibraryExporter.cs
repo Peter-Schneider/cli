@@ -220,7 +220,7 @@ namespace Microsoft.DotNet.ProjectModel.Compilation
                         }
                     }
 
-                    builder.AddRuntimeTarget(new LibraryRuntimeTarget(targetGroup.Key, runtime, native));
+                    builder.AddRuntimeTarget(new RuntimeAssetGroup(targetGroup.Key, runtime, native));
                 }
             }
 

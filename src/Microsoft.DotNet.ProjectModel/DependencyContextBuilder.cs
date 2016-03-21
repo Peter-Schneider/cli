@@ -154,11 +154,11 @@ namespace Microsoft.Extensions.DependencyModel
                 );
         }
 
-        private RuntimeTarget CreateRuntimeTarget(LibraryRuntimeTarget runtimeTarget)
+        private RuntimeTarget CreateRuntimeTarget(RuntimeAssetGroup runtimeTarget)
         {
             return new RuntimeTarget(
                 runtime: runtimeTarget.Runtime,
-                assemblies: runtimeTarget.RuntimeAssemblies.Select(a => RuntimeAssembly.Create(a.RelativePath)),
+                assemblies: runtimeTarget.Assets.Select(a => RuntimeAssembly.Create(a.RelativePath)),
                 nativeLibraries: runtimeTarget.NativeLibraries.Select(l => l.RelativePath)
                 );
         }

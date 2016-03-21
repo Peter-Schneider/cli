@@ -162,7 +162,7 @@ namespace Microsoft.DotNet.Tools.Publish
 
                 if (string.IsNullOrEmpty(context.RuntimeIdentifier))
                 {
-                    var assets = export.RuntimeTargets.SelectMany(t => Enumerable.Concat(t.NativeLibraries, t.RuntimeAssemblies));
+                    var assets = export.RuntimeTargets.SelectMany(t => Enumerable.Concat(t.NativeLibraries, t.Assets));
                     PublishFiles(assets, outputPath, nativeSubdirectories: false, preserveRelativePath: true);
                 }
 

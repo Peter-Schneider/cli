@@ -136,7 +136,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
                     },
                     runtimeTargets: new []
                     {
-                        new LibraryRuntimeTarget(
+                        new RuntimeAssetGroup(
                             "win8-x64",
                             new [] { new LibraryAsset("Dll", "win8-x64/Pack.Age.dll", "") },
                             new [] { new LibraryAsset("Dll", "win8-x64/Pack.Age.native.dll", "") }
@@ -293,7 +293,7 @@ namespace Microsoft.Extensions.DependencyModel.Tests
             LibraryDescription description,
             IEnumerable<LibraryAsset> compilationAssemblies = null,
             IEnumerable<LibraryAsset> runtimeAssemblies = null,
-            IEnumerable<LibraryRuntimeTarget> runtimeTargets = null,
+            IEnumerable<RuntimeAssetGroup> runtimeTargets = null,
             IEnumerable<LibraryResourceAssembly> resourceAssemblies = null)
         {
             return LibraryExportBuilder.Create(description)

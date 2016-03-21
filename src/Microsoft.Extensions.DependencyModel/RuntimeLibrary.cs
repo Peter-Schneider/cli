@@ -14,8 +14,8 @@ namespace Microsoft.Extensions.DependencyModel
             string name,
             string version,
             string hash,
-            RuntimeAssetCollection<RuntimeAssembly> assemblies,
-            RuntimeAssetCollection<string> nativeLibraries,
+            IReadOnlyList<RuntimeAssetGroup> assemblies,
+            IReadOnlyList<RuntimeAssetGroup> nativeLibraries,
             IEnumerable<ResourceAssembly> resourceAssemblies,
             IEnumerable<Dependency> dependencies,
             bool serviceable)
@@ -38,9 +38,9 @@ namespace Microsoft.Extensions.DependencyModel
             NativeLibraries = nativeLibraries;
         }
 
-        public RuntimeAssetCollection<RuntimeAssembly> Assemblies { get; }
+        public IReadOnlyList<RuntimeAssetGroup> Assemblies { get; }
 
-        public RuntimeAssetCollection<string> NativeLibraries { get; }
+        public IReadOnlyList<RuntimeAssetGroup> NativeLibraries { get; }
 
         public IReadOnlyList<ResourceAssembly> ResourceAssemblies { get; }
     }
